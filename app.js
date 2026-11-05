@@ -1358,6 +1358,81 @@
     }
 
     /* ----------------------------------------------------------------------
+       使用說明（內容來自 help.js，可自由修改）
+       ---------------------------------------------------------------------- */
+
+    function appendInline(parent, text) {
+        var parts = String(text).split(/\*\*(.+?)\*\*/g);
+        parts.forEach(function (part, index) {
+            if (!part) return;
+            if (index % 2 === 1) {
+                parent.appendChild(make('strong', '', part));
+            } else {
+                parent.appendChild(document.createTextNode(part));
+            }
+        });
+    }
+
+    function renderHelp() {
+        var raw = typeof window.WULIANGBU_HELP === 'string' ? window.WULIANGBU_HELP : '';
+
+        el.helpBody.textContent = '';
+
+        if (!raw.trim()) {
+            el.helpBody.appendChild(make('p', '', '找不到說明內容。請確認 help.js 是否存在且格式正確。'));
+            return;
+        }
+
+        var lines = raw.replace(/\r\n?/g, '\n').split('\n');
+        var list = null;
+
+        lines.forEach(function (line) {
+            var text = line.trim();
+
+            if (!text) {
+                list = null;
+                return;
+            }
+
+            if (text.indexOf('## ') === 0) {
+                list = null;
+                el.helpBody.appendChild(make('h3', '', text.slice(3).trim()));
+                return;
+            }
+
+            if (text.indexOf('- ') === 0) {
+                if (!list) {
+                    list = make('ul', 'help-list');
+                    el.helpBody.appendChild(list);
+                }
+                var item = document.createElement('li');
+                appendInline(item, text.slice(2).trim());
+                list.appendChild(item);
+                return;
+            }
+
+            if (text.indexOf('> ') === 0) {
+                list = null;
+                var note = make('div', 'help-note');
+                appendInline(note, text.slice(2).trim());
+                el.helpBody.appendChild(note);
+                return;
+            }
+
+            list = null;
+            var paragraph = document.createElement('p');
+            appendInline(paragraph, text);
+            el.helpBody.appendChild(paragraph);
+        });
+    }
+
+    function openHelp() {
+        renderHelp();
+        el.helpDialog.showModal();
+        el.helpClose.focus();
+    }
+
+    /* ----------------------------------------------------------------------
        事件綁定
        ---------------------------------------------------------------------- */
 
@@ -1375,6 +1450,7 @@
             'promptInput', 'promptLabel', 'promptError', 'promptCancel', 'promptOk',
             'confirmDialog', 'confirmTitle', 'confirmMessage', 'confirmCancel', 'confirmOk',
             'importDialog', 'importSummary', 'importMerge', 'importReplace', 'importCancel',
+            'helpDialog', 'helpBody', 'helpBtn', 'helpClose', 'helpOk',
             'toast', 'toastMessage', 'toastAction'
         ];
 
@@ -1445,8 +1521,12 @@
             el.editAmount.classList.remove('is-invalid');
         });
 
+        el.helpBtn.addEventListener('click', openHelp);
+        el.helpClose.addEventListener('click', function () { el.helpDialog.close(); });
+        el.helpOk.addEventListener('click', function () { el.helpDialog.close(); });
+
         // 點擊對話框外部（backdrop）關閉
-        [el.editDialog, el.promptDialog, el.confirmDialog, el.importDialog].forEach(function (dialog) {
+        [el.editDialog, el.promptDialog, el.confirmDialog, el.importDialog, el.helpDialog].forEach(function (dialog) {
             dialog.addEventListener('click', function (event) {
                 if (event.target === dialog) dialog.close();
             });

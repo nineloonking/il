@@ -12,15 +12,19 @@
     <meta name="apple-mobile-web-app-title" content="無量簿">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="app">
         <header class="app-header">
-            <h1>無量簿</h1>
-            <span class="sub">Immeasurable Ledger</span>
+            <h1>
+                <button type="button" class="brand" id="helpBtn" aria-haspopup="dialog" aria-controls="helpDialog" title="查看使用說明">
+                    <span class="brand-name">無量簿</span>
+                    <span class="sub">Immeasurable Ledger</span>
+                </button>
+            </h1>
         </header>
 
         <p class="notice" id="storageWarning" hidden>此瀏覽器停用了本機儲存空間，資料只會保留在本次瀏覽中。</p>
@@ -186,6 +190,19 @@
         </div>
     </dialog>
 
+    <!-- 使用說明 -->
+    <dialog id="helpDialog" class="dialog sheet help-dialog" aria-labelledby="helpTitle">
+        <div class="dialog-head">
+            <h2 id="helpTitle">使用說明</h2>
+            <button type="button" class="icon-btn" id="helpClose" aria-label="關閉">✕</button>
+        </div>
+        <div class="dialog-body help-body" id="helpBody"></div>
+        <div class="dialog-actions">
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-primary" id="helpOk">知道了</button>
+        </div>
+    </dialog>
+
     <div class="toast" id="toast" role="status" aria-live="polite">
         <span id="toastMessage"></span>
         <button type="button" id="toastAction" hidden></button>
@@ -195,6 +212,7 @@
         <p class="notice">此 App 需要 JavaScript 才能運作。</p>
     </noscript>
 
+    <script src="help.js" defer></script>
     <script src="app.js" defer></script>
 </body>
 </html>

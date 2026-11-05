@@ -97,9 +97,6 @@ textarea {
 /* ---------- 標題 / 頁籤 ---------- */
 
 .app-header {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
     margin: 0 2px 18px;
 }
 
@@ -107,6 +104,36 @@ textarea {
     margin: 0;
     font-size: 1.55rem;
     letter-spacing: 0.03em;
+}
+
+.brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: -4px -8px;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.brand:hover {
+    background: var(--surface-2);
+}
+
+.brand-name {
+    font-weight: 700;
+    border-bottom: 1px dotted transparent;
+}
+
+.brand:hover .brand-name,
+.brand:focus-visible .brand-name {
+    border-bottom-color: var(--text-muted);
 }
 
 .app-header .sub {
@@ -620,13 +647,13 @@ textarea {
     animation: dialog-pop 0.16s ease-out;
 }
 
+/* 只做位移、不做 opacity：在 <dialog> 上淡入透明度會留下錯誤的合成層，
+   令底層頁面看起來「透出來」。 */
 @keyframes dialog-pop {
     from {
-        opacity: 0.6;
-        transform: translateY(10px);
+        transform: translateY(10px) scale(0.985);
     }
     to {
-        opacity: 1;
         transform: none;
     }
 }
@@ -728,6 +755,59 @@ textarea {
     overflow-wrap: anywhere;
 }
 
+/* ---------- 使用說明 ---------- */
+
+.help-dialog[open] {
+    display: flex;
+    flex-direction: column;
+}
+
+.help-dialog .dialog-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.help-body {
+    font-size: 0.92rem;
+    line-height: 1.68;
+}
+
+.help-body h3 {
+    margin: 20px 0 6px;
+    font-size: 0.95rem;
+}
+
+.help-body h3:first-child {
+    margin-top: 4px;
+}
+
+.help-body p {
+    margin: 0 0 10px;
+}
+
+.help-body ul {
+    margin: 0 0 10px;
+    padding-left: 1.25em;
+}
+
+.help-body li {
+    margin: 3px 0;
+}
+
+.help-body strong {
+    font-weight: 700;
+}
+
+.help-note {
+    margin: 14px 0 4px;
+    padding: 10px 12px;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 9px 9px 0;
+    background: var(--accent-soft);
+    font-size: 0.85rem;
+}
+
 /* ---------- Toast ---------- */
 
 .toast {
@@ -810,11 +890,9 @@ textarea {
 
     @keyframes sheet-up {
         from {
-            opacity: 0.8;
             transform: translateY(28px);
         }
         to {
-            opacity: 1;
             transform: none;
         }
     }

@@ -15,6 +15,12 @@
   欄位，編碼為 UTF-8（含 BOM，Excel 可直接開啟）。
 - **清空**：會先匯出備份，再進行第二次確認。
 
+## 修改使用說明
+
+點擊畫面左上角的「無量簿」會開啟使用說明，內容放在 `help.js` 內的反引號之間。
+`## ` 是小標題、`- ` 是清單項目、`> ` 是提示框，其餘文字會成為一般段落，
+支援 `**粗體**`。改完存檔、重新載入即可看到。
+
 ## 檔案
 
 | 檔案 | 說明 |
@@ -22,9 +28,12 @@
 | `index.html` | 頁面結構 |
 | `styles.css` | 樣式（支援深色模式與手機版面） |
 | `app.js` | 所有邏輯（無外部依賴） |
+| `help.js` | 使用說明文字（點擊標題顯示，直接改這個檔） |
 | `sw.js` | Service Worker，離線快取 |
 | `manifest.json` | PWA 設定 |
-| `icon.png` / `icon-512.png` | App 圖示 |
+| `icon.png` / `icon-512.png` | App 圖示（圓角、深色底） |
+| `apple-touch-icon.png` | iOS 主畫面圖示（方形，由系統裁圓角） |
+| `icon-old.png` | 舊版圖示備份 |
 | `index-old.html` | 舊版，保留作為備份 |
 
 ## 資料
@@ -41,3 +50,5 @@
   （Service Worker 僅在 HTTP(S) 下生效）。
 - 修改檔案後若已註冊 Service Worker，請重新載入兩次或調整 `sw.js` 內的
   `CACHE_NAME` 版本號。
+- 不要在 `<dialog>` 上做 `opacity` 的進場動畫（只用 `transform`）。實測在
+  Chromium 會殘留錯誤的合成層，令底層頁面看起來「透出來」。

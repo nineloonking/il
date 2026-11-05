@@ -1,14 +1,16 @@
 /* 無量簿 — 離線快取 Service Worker */
 'use strict';
 
-const CACHE_NAME = 'wuliangbu-v3';
+const CACHE_NAME = 'wuliangbu-v6';
 const ASSETS = [
     './index.html',
     './styles.css',
     './app.js',
+    './help.js',
     './manifest.json',
     './icon.png',
-    './icon-512.png'
+    './icon-512.png',
+    './apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
