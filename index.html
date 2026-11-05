@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>無量簿 Immeasurable Ledger</title>
+    <meta name="description" content="無量簿 — 簡潔、離線可用的數字記錄 App。">
+    <meta name="theme-color" content="#2f7d5b" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#111613" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="無量簿">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="app-header">
+            <h1>無量簿</h1>
+            <span class="sub">Immeasurable Ledger</span>
+        </header>
+
+        <p class="notice" id="storageWarning" hidden>此瀏覽器停用了本機儲存空間，資料只會保留在本次瀏覽中。</p>
+
+        <nav class="tabs" role="tablist" aria-label="主要功能">
+            <button class="tab" type="button" role="tab" id="tabInput" aria-selected="true" aria-controls="panelInput" data-tab="input">輸入</button>
+            <button class="tab" type="button" role="tab" id="tabRecords" aria-selected="false" aria-controls="panelRecords" data-tab="records">
+                記錄 <span class="badge" id="recordCount">0</span>
+            </button>
+        </nav>
+
+        <main>
+        <section class="panel" id="panelInput" role="tabpanel" aria-labelledby="tabInput">
+            <form class="card" id="entryForm" novalidate>
+                <div class="amount-field" id="amountField">
+                    <label class="sr-only" for="amountInput">數字</label>
+                    <input id="amountInput" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0">
+                </div>
+
+                <div class="field">
+                    <span class="field-label">單位</span>
+                    <div class="chip-row" id="unitChips" role="group" aria-label="單位"></div>
+                </div>
+
+                <div class="field">
+                    <label for="textInput">文字</label>
+                    <input id="textInput" type="text" autocomplete="off" placeholder="例如：午餐、車費">
+                </div>
+
+                <div class="field">
+                    <span class="field-label">分類</span>
+                    <div class="chip-row" id="categoryChips" role="group" aria-label="分類"></div>
+                </div>
+
+                <details class="more">
+                    <summary>備註與選項</summary>
+                    <div class="more-body">
+                        <div class="field">
+                            <label for="remarksInput">備註</label>
+                            <textarea id="remarksInput" rows="3" placeholder="選填"></textarea>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="recordLocation">
+                            儲存時記錄位置
+                        </label>
+                    </div>
+                </details>
+
+                <div class="save-bar">
+                    <button class="btn btn-primary" type="submit">儲存</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="panel" id="panelRecords" role="tabpanel" aria-labelledby="tabRecords" hidden>
+            <div class="toolbar">
+                <input class="input search" id="searchInput" type="search" autocomplete="off" placeholder="搜尋文字、備註、分類" aria-label="搜尋記錄">
+            </div>
+            <div class="toolbar">
+                <button class="btn btn-sm" id="sortBtn" type="button" aria-label="切換排序">新 → 舊</button>
+                <label class="switch"><input type="checkbox" id="detailToggle"> 詳細</label>
+                <span class="spacer"></span>
+                <button class="btn btn-sm" id="exportBtn" type="button">匯出</button>
+                <button class="btn btn-sm" id="importBtn" type="button">匯入</button>
+                <button class="btn btn-sm btn-danger-ghost" id="clearBtn" type="button">清空</button>
+                <input type="file" id="importFile" accept=".csv,text/csv" hidden>
+            </div>
+            <p class="summary" id="summary" aria-live="polite"></p>
+            <div id="dataList"></div>
+        </section>
+        </main>
+    </div>
+
+    <!-- 編輯單筆記錄 -->
+    <dialog id="editDialog" class="dialog sheet" aria-labelledby="editTitle">
+        <form id="editForm" novalidate>
+            <div class="dialog-head">
+                <h2 id="editTitle">編輯資料</h2>
+                <button type="button" class="icon-btn" id="editClose" aria-label="關閉">✕</button>
+            </div>
+            <div class="dialog-body">
+                <div class="field">
+                    <label for="editAmount">數字</label>
+                    <input id="editAmount" type="text" inputmode="decimal" autocomplete="off">
+                </div>
+                <div class="field">
+                    <span class="field-label">單位</span>
+                    <div class="chip-row" id="editUnitChips" role="group" aria-label="單位"></div>
+                </div>
+                <div class="field">
+                    <label for="editText">文字</label>
+                    <input id="editText" type="text" autocomplete="off">
+                </div>
+                <div class="field">
+                    <span class="field-label">分類</span>
+                    <div class="chip-row" id="editCategoryChips" role="group" aria-label="分類"></div>
+                </div>
+                <div class="field">
+                    <label for="editRemarks">備註</label>
+                    <textarea id="editRemarks" rows="3"></textarea>
+                </div>
+                <p class="meta" id="editMeta"></p>
+            </div>
+            <div class="dialog-actions">
+                <button type="button" class="btn btn-danger-ghost" id="editDelete">刪除</button>
+                <span class="spacer"></span>
+                <button type="button" class="btn btn-ghost" id="editCancel">取消</button>
+                <button type="submit" class="btn btn-primary" id="editSave">儲存</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- 新增單位 / 分類 -->
+    <dialog id="promptDialog" class="dialog" aria-labelledby="promptTitle">
+        <form id="promptForm" novalidate>
+            <div class="dialog-head">
+                <h2 id="promptTitle">新增</h2>
+                <button type="button" class="icon-btn" id="promptClose" aria-label="關閉">✕</button>
+            </div>
+            <div class="dialog-body">
+                <div class="field">
+                    <label for="promptInput" id="promptLabel">名稱</label>
+                    <input id="promptInput" type="text" maxlength="20" autocomplete="off">
+                </div>
+                <p class="field-error" id="promptError" hidden></p>
+            </div>
+            <div class="dialog-actions">
+                <span class="spacer"></span>
+                <button type="button" class="btn btn-ghost" id="promptCancel">取消</button>
+                <button type="submit" class="btn btn-primary" id="promptOk">確定</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- 一般確認 -->
+    <dialog id="confirmDialog" class="dialog" aria-labelledby="confirmTitle">
+        <div class="dialog-head">
+            <h2 id="confirmTitle">確認</h2>
+        </div>
+        <div class="dialog-body">
+            <p class="dialog-text" id="confirmMessage"></p>
+        </div>
+        <div class="dialog-actions">
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-ghost" id="confirmCancel">取消</button>
+            <button type="button" class="btn btn-primary" id="confirmOk">確定</button>
+        </div>
+    </dialog>
+
+    <!-- 匯入模式 -->
+    <dialog id="importDialog" class="dialog" aria-labelledby="importTitle">
+        <div class="dialog-head">
+            <h2 id="importTitle">匯入 CSV</h2>
+        </div>
+        <div class="dialog-body">
+            <p class="dialog-text" id="importSummary"></p>
+            <p class="dialog-text muted">「合併」會略過完全相同的記錄；「取代」會先清空現有資料。</p>
+        </div>
+        <div class="dialog-actions dialog-actions-stack">
+            <button type="button" class="btn btn-primary" id="importMerge">合併（保留現有）</button>
+            <button type="button" class="btn btn-danger" id="importReplace">取代（清空後匯入）</button>
+            <button type="button" class="btn btn-ghost" id="importCancel">取消</button>
+        </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+        <span id="toastMessage"></span>
+        <button type="button" id="toastAction" hidden></button>
+    </div>
+
+    <noscript>
+        <p class="notice">此 App 需要 JavaScript 才能運作。</p>
+    </noscript>
+
+    <script src="app.js" defer></script>
+</body>
+</html>

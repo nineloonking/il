@@ -1,16 +1,25 @@
 {
-    "name": "無量簿",
-    "short_name": "無量",
-    "start_url": "index.html",
+    "name": "無量簿 Immeasurable Ledger",
+    "short_name": "無量簿",
+    "description": "簡潔、離線可用的數字記錄 App。",
+    "lang": "zh-Hant",
+    "start_url": "./index.html",
+    "scope": "./",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#4CAF50",
-    "scope": ".",
+    "theme_color": "#2f7d5b",
     "icons": [
         {
             "src": "icon.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
         }
     ]
 }
